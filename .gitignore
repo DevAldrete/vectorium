@@ -1,0 +1,15 @@
+# Builds
+zig-out/
+
+# Cache 
+.zig-cache/
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files 
+tmp/
+
+# AI
+AGENTS.md
