@@ -65,6 +65,17 @@ pub const Mat2x2 = struct {
             .y = .{ self.x[1], self.y[1] },
         };
     }
+
+    pub fn fromRows(rows: *const [2]vector.Vec2) Mat2x2 {
+        if (rows.len != 2) {
+            @panic("Expected exactly 2 rows for a 2x2 matrix");
+        }
+
+        return .{
+            .x = .{ rows[0].x, rows[0].y },
+            .y = .{ rows[1].x, rows[1].y },
+        };
+    }
 };
 
 // 3x3 Matrix struct with the essential operations
@@ -156,6 +167,17 @@ pub const Mat3x3 = struct {
             .x = .{ self.x[0], self.y[0], self.z[0] },
             .y = .{ self.x[1], self.y[1], self.z[1] },
             .z = .{ self.x[2], self.y[2], self.z[2] },
+        };
+    }
+
+    pub fn fromRows(rows: *const [3]vector.Vec3) Mat3x3 {
+        if (rows.len != 3) {
+            @panic("Expected exactly 3 rows for a 3x3 matrix");
+        }
+        return .{
+            .x = .{ rows[0].x, rows[0].y, rows[0].z },
+            .y = .{ rows[1].x, rows[1].y, rows[1].z },
+            .z = .{ rows[2].x, rows[2].y, rows[2].z },
         };
     }
 };
@@ -296,6 +318,18 @@ pub const Mat4x4 = struct {
             .y = .{ self.x[1], self.y[1], self.z[1], self.w[1] },
             .z = .{ self.x[2], self.y[2], self.z[2], self.w[2] },
             .w = .{ self.x[3], self.y[3], self.z[3], self.w[3] },
+        };
+    }
+
+    pub fn fromRows(rows: *const [4]vector.Vec4) Mat4x4 {
+        if (rows.len != 4) {
+            @panic("Expected exactly 4 rows for a 4x4 matrix");
+        }
+        return .{
+            .x = .{ rows[0].x, rows[0].y, rows[0].z, rows[0].w },
+            .y = .{ rows[1].x, rows[1].y, rows[1].z, rows[1].w },
+            .z = .{ rows[2].x, rows[2].y, rows[2].z, rows[2].w },
+            .w = .{ rows[3].x, rows[3].y, rows[3].z, rows[3].w },
         };
     }
 };
