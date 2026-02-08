@@ -36,6 +36,7 @@ pub const Vec2 = struct {
                 .y = self.y / len,
             };
         }
+        return .{ .x = 0.0, .y = 0.0 };
     }
 
     pub fn scale(self: *const Self, scalar: f32) Self {
@@ -94,6 +95,7 @@ pub const Vec3 = struct {
                 .z = self.z / len,
             };
         }
+        return .{ .x = 0.0, .y = 0.0, .z = 0.0 };
     }
 
     pub fn cross(self: *const Self, b: *const Vec3) Vec3 {
@@ -149,6 +151,7 @@ pub const Vec4 = struct {
                 .w = self.w / len,
             };
         }
+        return .{ .x = 0.0, .y = 0.0, .z = 0.0, .w = 0.0 };
     }
 
     pub fn scale(self: *const Self, scalar: f32) Self {

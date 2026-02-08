@@ -142,6 +142,25 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_mod_tests.step);
     test_step.dependOn(&run_exe_tests.step);
 
+    // Example executables
+    const solver_demo = b.addExecutable(.{
+        .name = "solver_demo",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("examples/solver_demo.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "vectorium", .module = mod },
+            },
+        }),
+    });
+    b.installArtifact(solver_demo);
+
+    const run_solver_demo = b.addRunArtifact(solver_demo);
+    run_solver_demo.step.dependOn(b.getInstallStep());
+    const solver_demo_step = b.step("solver-demo", "Run the linear algebra solver demonstration");
+    solver_demo_step.dependOn(&run_solver_demo.step);
+
     // Just like flags, top level steps are also listed in the `--help` menu.
     //
     // The Zig build system is entirely implemented in userland, which means
