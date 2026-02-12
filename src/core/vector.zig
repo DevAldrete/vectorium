@@ -1,3 +1,5 @@
+//! Basic vector mathematics library in Zig
+
 const std = @import("std");
 
 // 2D Vector struct with basic operations

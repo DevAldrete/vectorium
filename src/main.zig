@@ -2,6 +2,8 @@ const std = @import("std");
 const vectorium = @import("vectorium");
 
 const vector = vectorium.core.vector;
+const matrix = vectorium.core.matrix;
+const functions = vectorium.core.functions;
 const print = std.debug.print;
 
 pub fn main() !void {
@@ -49,10 +51,83 @@ pub fn main() !void {
     print("5. Vector Projection:\n", .{});
     const unit_i = vector.Vec3{ .x = 1.0, .y = 0.0, .z = 0.0 };
     const vec_to_project = vector.Vec3{ .x = 3.0, .y = 4.0, .z = 0.0 };
-    const projection_scalar = vec_to_project.dot(&unit_i) / unit_i.dot(&unit_i);
-    const projection = unit_i.scale(projection_scalar);
+    const projection = functions.projectVec3(&vec_to_project, &unit_i);
     print("   Projecting ({d}, {d}, {d}) onto x-axis\n", .{ vec_to_project.x, vec_to_project.y, vec_to_project.z });
     print("   Projection: ({d:.3}, {d:.3}, {d:.3})\n\n", .{ projection.x, projection.y, projection.z });
+
+    print("\n=== Linear Transformations Demo ===\n\n", .{});
+
+    // 6. 2D Rotation
+    print("6. 2D Rotation (90 degrees):\n", .{});
+    const rot_90 = functions.rotation2D(std.math.pi / 2.0);
+    const v2d = vector.Vec2{ .x = 1.0, .y = 0.0 };
+    const rotated_2d = functions.transform2D(&rot_90, &v2d);
+    print("   Original: ({d:.3}, {d:.3})\n", .{ v2d.x, v2d.y });
+    print("   Rotated:  ({d:.3}, {d:.3})\n\n", .{ rotated_2d.x, rotated_2d.y });
+
+    // 7. 3D Rotation around axis
+    print("7. 3D Rotation around Y-axis (45 degrees):\n", .{});
+    const rot_y = functions.rotationY(std.math.pi / 4.0);
+    const v3d = vector.Vec3{ .x = 1.0, .y = 0.0, .z = 0.0 };
+    const rotated_3d = functions.transform3D(&rot_y, &v3d);
+    print("   Original: ({d:.3}, {d:.3}, {d:.3})\n", .{ v3d.x, v3d.y, v3d.z });
+    print("   Rotated:  ({d:.3}, {d:.3}, {d:.3})\n\n", .{ rotated_3d.x, rotated_3d.y, rotated_3d.z });
+
+    // 8. Gram-Schmidt Orthogonalization
+    print("8. Gram-Schmidt Orthogonalization:\n", .{});
+    const gs_v1 = vector.Vec3{ .x = 1.0, .y = 1.0, .z = 0.0 };
+    const gs_v2 = vector.Vec3{ .x = 1.0, .y = 0.0, .z = 1.0 };
+    const gs_v3 = vector.Vec3{ .x = 0.0, .y = 1.0, .z = 1.0 };
+    const orthonormal = functions.gramSchmidt3D(gs_v1, gs_v2, gs_v3);
+    print("   Input vectors:\n", .{});
+    print("   v1 = ({d:.3}, {d:.3}, {d:.3})\n", .{ gs_v1.x, gs_v1.y, gs_v1.z });
+    print("   v2 = ({d:.3}, {d:.3}, {d:.3})\n", .{ gs_v2.x, gs_v2.y, gs_v2.z });
+    print("   v3 = ({d:.3}, {d:.3}, {d:.3})\n", .{ gs_v3.x, gs_v3.y, gs_v3.z });
+    print("   Orthonormal basis:\n", .{});
+    print("   e1 = ({d:.3}, {d:.3}, {d:.3}), length = {d:.3}\n", .{ orthonormal[0].x, orthonormal[0].y, orthonormal[0].z, orthonormal[0].length() });
+    print("   e2 = ({d:.3}, {d:.3}, {d:.3}), length = {d:.3}\n", .{ orthonormal[1].x, orthonormal[1].y, orthonormal[1].z, orthonormal[1].length() });
+    print("   e3 = ({d:.3}, {d:.3}, {d:.3}), length = {d:.3}\n", .{ orthonormal[2].x, orthonormal[2].y, orthonormal[2].z, orthonormal[2].length() });
+    print("   e1 · e2 = {d:.6} (should be ~0)\n", .{orthonormal[0].dot(&orthonormal[1])});
+    print("   e1 · e3 = {d:.6} (should be ~0)\n", .{orthonormal[0].dot(&orthonormal[2])});
+    print("   e2 · e3 = {d:.6} (should be ~0)\n\n", .{orthonormal[1].dot(&orthonormal[2])});
+
+    // 9. Matrix determinant and inverse
+    print("9. Matrix Determinant and Inverse:\n", .{});
+    const m3 = matrix.Mat3x3{
+        .x = .{ 1.0, 2.0, 3.0 },
+        .y = .{ 0.0, 1.0, 4.0 },
+        .z = .{ 5.0, 6.0, 0.0 },
+    };
+    const det = m3.determinant();
+    print("   Matrix determinant: {d:.3}\n", .{det});
+    if (m3.inverse()) |inv| {
+        const identity_check = m3.mul(&inv);
+        print("   Inverse exists!\n", .{});
+        print("   M * M^-1 diagonal: ({d:.3}, {d:.3}, {d:.3})\n", .{ identity_check.x[0], identity_check.y[1], identity_check.z[2] });
+    }
+    print("\n", .{});
+
+    // 10. Angle between vectors
+    print("10. Angle Between Vectors:\n", .{});
+    const angle_v1 = vector.Vec3{ .x = 1.0, .y = 0.0, .z = 0.0 };
+    const angle_v2 = vector.Vec3{ .x = 1.0, .y = 1.0, .z = 0.0 };
+    const angle = functions.angleBetween3D(&angle_v1, &angle_v2);
+    print("   v1 = ({d:.3}, {d:.3}, {d:.3})\n", .{ angle_v1.x, angle_v1.y, angle_v1.z });
+    print("   v2 = ({d:.3}, {d:.3}, {d:.3})\n", .{ angle_v2.x, angle_v2.y, angle_v2.z });
+    print("   Angle: {d:.3} radians ({d:.1} degrees)\n\n", .{ angle, angle * 180.0 / std.math.pi });
+
+    // 11. Linear interpolation
+    print("11. Linear Interpolation (LERP):\n", .{});
+    const lerp_start = vector.Vec3{ .x = 0.0, .y = 0.0, .z = 0.0 };
+    const lerp_end = vector.Vec3{ .x = 10.0, .y = 20.0, .z = 30.0 };
+    const lerp_25 = functions.lerp3D(&lerp_start, &lerp_end, 0.25);
+    const lerp_50 = functions.lerp3D(&lerp_start, &lerp_end, 0.5);
+    const lerp_75 = functions.lerp3D(&lerp_start, &lerp_end, 0.75);
+    print("   Start: ({d:.1}, {d:.1}, {d:.1})\n", .{ lerp_start.x, lerp_start.y, lerp_start.z });
+    print("   25%:   ({d:.1}, {d:.1}, {d:.1})\n", .{ lerp_25.x, lerp_25.y, lerp_25.z });
+    print("   50%:   ({d:.1}, {d:.1}, {d:.1})\n", .{ lerp_50.x, lerp_50.y, lerp_50.z });
+    print("   75%:   ({d:.1}, {d:.1}, {d:.1})\n", .{ lerp_75.x, lerp_75.y, lerp_75.z });
+    print("   End:   ({d:.1}, {d:.1}, {d:.1})\n\n", .{ lerp_end.x, lerp_end.y, lerp_end.z });
 
     print("=== All tests complete! ===\n", .{});
 }
